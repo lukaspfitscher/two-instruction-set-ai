@@ -1,10 +1,3 @@
-#54 edited new on 220530
-#56 reset jump to yero on every question (cp = var_end)
-#57 test if just repeat works, commenting out some questions 
-#58 remaining only two questions, decreasing cycles from 3000 to 170:
-# 2answers * 5bit per question * 16signs + 1cyclefordifercing + 9buffer = 170
-#59
-
 from random        import randint  as rnd
 from bitarray      import bitarray as b		# pip3 install bitarray
 from bitarray.util import ba2int,int2ba
