@@ -1,3 +1,10 @@
+#54 edited new on 220530
+#56 reset jump to yero on every question (cp = var_end)
+#57 test if just repeat works, commenting out some questions 
+#58 remaining only two questions, decreasing cycles from 3000 to 170:
+# 2answers * 5bit per question * 16signs + 1cyclefordifercing + 9buffer = 170
+#59
+
 from random        import randint  as rnd
 from bitarray      import bitarray as b		# pip3 install bitarray
 from bitarray.util import ba2int,int2ba
@@ -17,23 +24,17 @@ qststr = [
 'five plus one   ','ten plus six    ','two plus four   ','two plus two    ','seven plus one  ','one plus six    ',
 'color sky       ','color wood      ','color blood     ','color sun       ','color grass     ','write nothing   ',
 'color glas      ','define an hour  ','your creator    ','say hi          ','firs element    ','your country    ',
-'say hallo       ','say mula        ','most element air','write rocket    ','second element  ','third element   ',
 'write all e     ','write all f     ','write all s     ','write all g     ','write all t     ','write all h     ',
-'write all a     ','write all w     ','write all y     ','write all b     ','write all z     ','write all o     ',
-'write all q     ','write all n     ','write all d     ','write all k     ','write all c     ','write all s     ',
 'write all d     ','write all u     ','write all k     ','write all r     ','write all m     ','write all i     ']#string array containing questions string
 awrstr = [
 'zero            ','one             ','one             ','two             ','two             ','three           ',
 'six             ','onesix          ','six             ','four            ','eigh            ','seven           ',
 'blue            ','brown           ','red             ','yellow          ','green           ','                ',
 'transparent     ','sixteen minuts  ','lukas pfitscher ','hi              ','hydrogen        ','italy           ',
-'hallo           ','mula            ','nitrogen        ','rocket          ','helium          ','lithium         ',
 'eeeeeeeeeeeeeeee','ffffffffffffffff','ssssssssssssssss','gggggggggggggggg','tttttttttttttttt','hhhhhhhhhhhhhhhh',
-'aaaaaaaaaaaaaaaa','wwwwwwwwwwwwwwww','yyyyyyyyyyyyyyyy','bbbbbbbbbbbbbbbb','zzzzzzzzzzzzzzzz','oooooooooooooooo',
-'qqqqqqqqqqqqqqqq','nnnnnnnnnnnnnnnn','dddddddddddddddd','kkkkkkkkkkkkkkkk','cccccccccccccccc','ssssssssssssssss',
 'dddddddddddddddd','uuuuuuuuuuuuuuuu','kkkkkkkkkkkkkkkk','rrrrrrrrrrrrrrrr','mmmmmmmmmmmmmmmm','iiiiiiiiiiiiiiii']#string array containing answer string
 
-amt_chg			= 10					#initial amount changes
+amt_chg 		= 10					#initial amount changes
 cntbitssign		= 5						#count bits per sign
 cntletrqest		= len(qststr[0])		#= 16, count letters per question
 cntbitqest		= cntbitssign * len(qststr[0])	#bits per question
@@ -46,8 +47,8 @@ sec_ctr			= len(qststr)			#end section counter in bits, will increse on every ne
 sec_inp			= sec_ctr				#start section input
 sec_otp			= sec_inp + cntbitsqest	# 3+80 cntbitsqest = 80, start section output
 sec_end			= sec_otp + cntbitsqest	#83+80=163, start section end
-var_end			= 250					#end of variable section in bits
-var_lgh			= var_end-sec_end
+var_end			= 200					#end of variable section in bits
+var_lgh			= 200-sec_end
 
 al 				= 18			#adress lenght cmd_lgh
 sz 				= 2**al			#2^13=8192,2^16=65536,2^19=524288, storage size 2
@@ -67,7 +68,7 @@ print("")
 print("section end counter:   "+str(len(qststr)))
 print("section end in/out:    "+str(sec_end))
 print("section end variabl    "+str(var_end))
-print("varaible section size: "+str(var_lgh))
+print("varaible size:         "+str(var_lgh))
 print("bit question:          "+str(int(cntbitqest)))
 print("bit question total:    "+str(cnttotqes))
 print("bit program lenght:    "+str(sz))
@@ -112,7 +113,7 @@ while ctr_sar < 2:
 def randomcommand():  x = int2ba(rnd(0,cnt_cmd-1)*cmd_lgh+var_end,al);return x
 def randomvariable(): x = int2ba(rnd(0,var_end-1),al);return x
 
-option = input('write 1 for new, 2 for saved, 3 for testing, 4 for 200 times change:') #testing sets changes to zero
+option = input('write 1 for new, 2 for saved, 3 for testing:') #testing sets changes to zero
 
 if option == '1':
  ctr_chg = 0 #counter changes in the programm
@@ -124,7 +125,7 @@ if option == '1':
   ctr_chg += 1
  #n1 = n2.copy()
  #print(n2)
-else: #for option 2 and 3
+else:
  if option == '3': amt_chg = 0 #3 stands for testing
 #copy saved array to internal array####################################################
  f = open("program.txt","r")
@@ -134,16 +135,6 @@ else: #for option 2 and 3
   if savdpogm[cntrsvdprog] == '0': n2[cntrsvdprog] = 0
   else: n2[cntrsvdprog] = 1
   cntrsvdprog += 1
-  
- if option == '4':
-  amtchanglocalmin = 0
-  while amtchanglocalmin < 200:
-   print("hallo")
-   rnd_cmd = rnd(0,1)							#random command
-   rnd_adr = rnd(0,cnt_cmd-1)*cmd_lgh+var_end	#random valid adresses of a command in dec
-   if rnd_cmd == 0: n2[rnd_adr:rnd_adr+cmd_lgh]=b('0')+randomvariable()+randomvariable()+randomcommand() #random move command
-   if rnd_cmd == 1: n2[rnd_adr:rnd_adr+cmd_lgh]=b('1')+randomvariable()+randomcommand()+randomcommand() #random jump command
-   amtchanglocalmin += 1
 
 #inputs ################################################################################
 ctr_pgm = 0 #counter program
@@ -220,13 +211,12 @@ while True: #main loop
   ctr_chg += 1
 
 # user interface ################################################################################
- if ctr_pgm % 10 == 0: #command line update increse number for efficiency
-  print("%6s"%str(int(time.time()-srt_tme))+"%10s"%str(ctr_pgm)+' g1:'+str(cntbitsqest*cntqst)+'/'+str(g1)+"%10s"%str(g2output))
+ if ctr_pgm % 1 == 0: #command line update increse number for efficiency
   if ctr_pgm % 100 == 0: #saving nett, if programm counter is divideable by 100
    textfile = open("program.txt","w")
    textfile.write(str(n1))
    textfile.close()
-   
+   print("%6s"%str(int(time.time()-srt_tme))+"%10s"%str(ctr_pgm)+' g1:'+str(cntbitsqest*cntqst)+'/'+str(g1)+"%10s"%str(g2output))
 
 '''
   screen.fill((0,0,0))
